@@ -26,10 +26,10 @@ class Triangle:
         if position1 == ON_SEGMENT or position2 == ON_SEGMENT or position3 == ON_SEGMENT:
             return BORDER
         
-        if position1 == LEFT and position2 == LEFT or position3 == LEFT:
+        if position1 == LEFT and position2 == LEFT and position3 == LEFT:
             return INSIDE
         
-        if position1 == RIGHT and position2 == RIGHT or position3 == RIGHT:
+        if position1 == RIGHT and position2 == RIGHT and position3 == RIGHT:
             return INSIDE
         
         return OUTSIDE
@@ -45,21 +45,37 @@ class GeometryUtils:
         return (a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y)
 
 class Vector2D:
-    def __init__(self, head, tail):
-        self.head = head
-        self.tail = tail
+    def __init__(self, start, end):
+        self.start = start
+        self.end = end
     
     def determineRelativePosition(self, p):
-        det = GeometryUtils.calculateDeterminant(self.head, self.tail, p)
+        det = GeometryUtils.calculateDeterminant(self.start, self.end, p)
         if det < 0:
             return RIGHT
         if det > 0:
             return LEFT
 
-        if GeometryUtils.calculateSquareDistance(self.head, self.tail) <= GeometryUtils.calculateSquareDistance(self.head, p):
+        minX = min(self.start.x, self.end.x)
+        maxX = max(self.start.x, self.end.x)
+
+        if minX <= p.x and p.x <= maxX:
             return ON_SEGMENT
         else:
             return ON_LINE
 
 #Test 1
 t = Triangle(Point2D(0, 0), Point2D(5, 5), Point2D(0, 6))
+points = [Point2D(3, 3), Point2D(6, 6), Point2D(2, 3)]
+for p in points:
+    print(t.determineRelativePosition(p))
+
+
+#Test 2
+t = Triangle(Point2D(1, 0), Point2D(0, 3), Point2D(3, 3))
+points = [
+    Point2D(0, 0), Point2D(0, 1), Point2D(0, 2), Point2D(0, 3), Point2D(1, 0), Point2D(1, 1), Point2D(1, 2),
+    Point2D(1, 3), Point2D(2, 0), Point2D(2, 1), Point2D(2, 2), Point2D(2, 3)
+]
+for p in points:
+    print(t.determineRelativePosition(p))
