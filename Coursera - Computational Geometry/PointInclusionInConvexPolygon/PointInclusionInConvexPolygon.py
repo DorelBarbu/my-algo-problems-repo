@@ -1,7 +1,7 @@
 import unittest
+import math
 
 EPS = 0.000001
-M = None
 
 def eq(x, y):
   return abs(x - y) < EPS
@@ -17,16 +17,16 @@ class Point:
   def __str__(self):
     return "(" + str(self.x) + " ," + str(self.y) + ")"
 
-
 # If p1 < p2 return something negative. Else return something positive.
-def cmp(p1, p2):
-  tg1 = (p1.x - M.x) / (p1.y - M.y) if neq(p1.y, M.y) else None
-  tg2 = (p2.x - M.x) / (p2.y - M.y) if neq(p2.y, M.y) else None
+def createCmp(M):
+  def cmp(p1, p2):
+    d = det(M, p2, p1)
+    return d if d != 0 else p1.x - p2.x 
 
-  if tg1 and tg2:
-    return tg1 - tg2
+  return cmp
 
-  return p1.x - p2.x if neq(p1.x, p2.x) else p1.y - p2.y
+def det(a, b, c):
+  return (b.x - a.x) * (c.y - a.y) - (b.y - a.y) * (c.x - a.x)
 
 
 def computeCenterOfMass(polygon):
@@ -34,10 +34,35 @@ def computeCenterOfMass(polygon):
 
 # Driver function to solve the problem
 def solve(polygon, points):
-  global M
   M = computeCenterOfMass(polygon)
   
 
+# Determine in which wedge the point p lies.
+# pivot is a point from inside the polygon
+# polygon represents an array of verticies in counterclockwise order
+# Wedge n is given by polygon[n] and polygon[n + 1]
+def findWedge(polygon, pivot, p):
+  left = 0
+  right = len(polygon) - 1
+  m = 0
+  solution = 0
+  while left <= right:
+    m = math.floor((left + right) / 2)
+    d = det(pivot, polygon[m], p)
+
+    if d == 0:
+      break
+    if d < 0:
+      right = m - 1
+      solution = m - 1
+      if solution < 0:
+        solution = len(polygon) - 1
+    else:
+      left = m + 1
+      solution = m
+    
+
+  return solution
 
 #Test 1
 
@@ -57,6 +82,3 @@ points = [
 ]
 
 #solve(polygon, points)
-
-x = -1
-assert x >= 0, "Should be >= 0"
