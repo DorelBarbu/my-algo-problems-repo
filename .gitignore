@@ -2,4 +2,3 @@
 !.gitignore
 node_modules/
 */
-.mypy_caches
