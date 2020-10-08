@@ -62,7 +62,7 @@ bool concat(Trie *root, Trie *t, string w, int k, int c)
   cout<<w<<' '<<k<<' '<<c<<endl;
   if (w.length() - 1 == k)
   {
-    cout<<"yes"<<endl;
+    cout<<"yes"<<endl; 
     return t->isWordEnding;
   }
 
