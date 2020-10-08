@@ -19,7 +19,6 @@ def solve(x, y, currentLength, k, path, N):
 
     if currentLength == k:
         validPossibilities += 1
-        #print(path)
         return
 
     for i in range(BOARD_SIZE):
