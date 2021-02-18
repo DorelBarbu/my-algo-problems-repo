@@ -1,4 +1,7 @@
-#include <bits/stdc++.h>
+#include <assert.h>
+
+#include <iostream>
+#include <vector>
 #define DEBUG(x) cout << "[" << #x << " : " << x << "] ";
 #define DEBUG_NL(x) \
   DEBUG(x)          \
@@ -14,9 +17,23 @@
 
 using namespace std;
 
+const int INF = 3 * 1e5;
+
 int min(int x, int y) { return x > y ? y : x; }
 
 int max(int x, int y) { return x > y ? x : y; }
+
+class TreeNode {
+ public:
+  int position;
+  int mn;
+  int mx;
+  TreeNode(int position, int mn, int mx) {
+    this->position = position;
+    this->mn = mn;
+    this->mx = mx;
+  }
+};
 
 class SegmentTree {
  private:
@@ -30,7 +47,6 @@ class SegmentTree {
       return;
     }
     if (tl == tr) {
-      DEBUG_NL(v)
       this->treeMin[v] = value;
       this->treeMax[v] = value;
       return;
@@ -76,11 +92,12 @@ class SegmentTree {
   }
 
   int getMin(int left, int right) {
-    return this->query(0, 0, this->n - 1, left, right, min, 100000, this->treeMin);
+    return this->query(0, 0, this->n - 1, left, right, min, INF, this->treeMin);
   }
 
   int getMax(int left, int right) {
-    return this->query(0, 0, this->n - 1, left, right, max, -100000, this->treeMax);
+    return this->query(0, 0, this->n - 1, left, right, max, -INF,
+                       this->treeMax);
   }
 };
 
@@ -91,7 +108,6 @@ void test_segment_tree() {
   t.set(0, 1);
   t.set(1, 4);
   t.set(2, 3);
-  DEBUG_V(t.treeMin)
   assert(t.getMin(2, 3) == 2);
   assert(t.getMin(1, 2) == 3);
   assert(t.getMin(2, 3) == 2);
@@ -101,23 +117,77 @@ void test_segment_tree() {
   assert(t.getMax(1, 3) == 4);
 }
 
+int sum(int left, int right, vector<int> v) {
+  assert(left > 0);
+  return v[right] - v[left - 1];
+}
+
+int query(int left, int right, SegmentTree &tree, vector<int> partial_sum,
+          int n) {
+  int a1 = tree.getMin(0, left - 1);
+  int b1 = tree.getMax(0, left - 1);
+  int d = sum(left, right, partial_sum);
+  int a2 = tree.getMin(right + 1, n) - d;
+  int b2 = tree.getMax(right + 1, n) - d;
+
+  int result = max(b1, b2) - min(a1, a2) + 1;
+  // DEBUG_NL(result)
+  // DEBUG_NL("----")
+  return result;
+}
+
+void solve(int n, int m, string s) {
+  SegmentTree tree(n + 1);
+
+  vector<int> v(n + 1);
+  vector<int> partial_sum(n + 1);
+  v[0] = 0;
+  partial_sum[0] = 0;
+  tree.set(0, 0);
+  for (int i = 0; i < n; i++) {
+    if (s[i] == '-') {
+      v[i + 1] = v[i] - 1;
+    } else {
+      v[i + 1] = v[i] + 1;
+    }
+    tree.set(i + 1, v[i + 1]);
+  }
+  while (m--) {
+    int l, r;
+    cin >> l >> r;
+    cout << query(l, r, tree, v, n) << endl;
+  }
+}
+
+void generate_test() {
+  cout << 200000 << ' ' << 200000 << endl;
+  for (int i = 0; i < 200000; i++) {
+    cout << "+";
+  }
+  cout << endl;
+  for (int i = 1; i <= 200000; i++) {
+    cout << 1 << ' ' << i << endl;
+  }
+}
+
 // #define ONLINE_JUDGE
 int main() {
 #ifndef ONLINE_JUDGE
   freopen("input.txt", "r", stdin);
   freopen("output.txt", "w", stdout);
+#endif
+  ios::sync_with_stdio(false);
+  cin.tie(nullptr), cout.tie(nullptr);
+
   int t;
   cin >> t;
   while (t--) {
     int n, m;
     string s;
     cin >> n >> m >> s;
-    while (m--) {
-      int l, r;
-      cin >> l >> r;
-    }
+    solve(n, m, s);
   }
-  test_segment_tree();
-#endif
+  // test_segment_tree();
+  // generate_test();
   return 0;
 }
