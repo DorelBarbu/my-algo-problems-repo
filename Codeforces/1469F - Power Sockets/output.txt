@@ -1,0 +1,4 @@
+[seen_white_beads : 3] 
+[seen_white_beads : 5] 
+[seen_white_beads : 6] 
+1
